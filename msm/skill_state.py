@@ -1,5 +1,6 @@
 """Functions related to manipulating the skills.json file."""
 import json
+import os
 from logging import getLogger
 from os.path import expanduser, isfile, dirname
 from os import makedirs
