@@ -24,6 +24,7 @@ from os import makedirs
 from os.path import exists, join, isdir, dirname, basename, normpath
 import json
 from tempfile import gettempdir
+from xdg import BaseDirectory
 
 from git import Repo
 from git.exc import GitCommandError, GitError
@@ -112,7 +113,7 @@ def load_skills_data(branch, path):
 
 class SkillRepo(object):
     def __init__(self, path=None, url=None, branch=None):
-        self.path = path or "/opt/mycroft/.skills-repo"
+        self.path = path or BaseDirectory.save_data_path('mycroft/.skills-repo')
         self.url = url or "https://github.com/MycroftAI/mycroft-skills"
         self.branch = branch or "20.08"
         self.repo_info = {}
