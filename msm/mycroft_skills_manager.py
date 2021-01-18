@@ -86,7 +86,7 @@ def save_device_skill_state(func):
 
 class MycroftSkillsManager(object):
     SKILL_GROUPS = {'default', 'mycroft_mark_1', 'picroft', 'kde',
-                    'respeaker', 'mycroft_mark_2', 'mycroft_mark_2pi'}
+                    'respeaker', 'mycroft_mark_2', 'mycroft_mark_2pi', 'OpenVoiceOS'}
 
     def __init__(self, platform='default', skills_dir=None, repo=None,
                  versioned=True):
