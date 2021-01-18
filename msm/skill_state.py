@@ -2,7 +2,7 @@
 import json
 import os
 from logging import getLogger
-from os.path import isfile, dirname, join
+from os.path import expanduser, isfile, dirname, join
 from os import makedirs
 import os
 from xdg import BaseDirectory

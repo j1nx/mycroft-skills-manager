@@ -30,6 +30,7 @@ from glob import glob
 from multiprocessing.pool import ThreadPool
 from os import path
 from typing import Dict, List
+from xdg import BaseDirectory
 
 from msm import GitException
 from msm.exceptions import (
@@ -86,13 +87,12 @@ def save_device_skill_state(func):
 class MycroftSkillsManager(object):
     SKILL_GROUPS = {'default', 'mycroft_mark_1', 'picroft', 'kde',
                     'respeaker', 'mycroft_mark_2', 'mycroft_mark_2pi'}
-    DEFAULT_SKILLS_DIR = "/opt/mycroft/skills"
 
     def __init__(self, platform='default', skills_dir=None, repo=None,
                  versioned=True):
         self.platform = platform
         self.skills_dir = (
-                path.expanduser(skills_dir or '') or self.DEFAULT_SKILLS_DIR
+                path.expanduser(skills_dir or '') or BaseDirectory.save_data_path('mycroft/skills')
         )
         self.repo = repo or SkillRepo()
         self.versioned = versioned
@@ -183,12 +183,20 @@ class MycroftSkillsManager(object):
     def _merge_remote_with_local(self, remote_skills):
         """Merge the skills found in the repo with those installed locally."""
         all_skills = []
-        for skill_file in glob(path.join(self.skills_dir, '*', '__init__.py')):
-            skill = SkillEntry.from_folder(path.dirname(skill_file), msm=self,
-                                           use_cache=False)
-            if skill.id in remote_skills:
-                skill.attach(remote_skills.pop(skill.id))
-            all_skills.append(skill)
+        skill_dirs = []
+        for directory in BaseDirectory.load_data_paths('mycroft/skills'):
+            # Make sure we don't add the XDG save data path twice
+            if directory != self.skills_dir:
+                skill_dirs.append(directory)
+        skill_dirs.append(self.skills_dir)
+
+        for skills_dir in skill_dirs:
+            for skill_file in glob(path.join(skills_dir, '*', '__init__.py')):
+                skill = SkillEntry.from_folder(path.dirname(skill_file), msm=self,
+                                               use_cache=False)
+                if skill.id in remote_skills:
+                    skill.attach(remote_skills.pop(skill.id))
+                all_skills.append(skill)
         all_skills.extend(remote_skills.values())
 
         return all_skills
